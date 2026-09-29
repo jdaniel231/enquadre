@@ -1,0 +1,85 @@
+pt-BR:
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%d/%m"
+      long: "%d de %B de %Y"
+    day_names: [Domingo, Segunda-feira, Terça-feira, Quarta-feira, Quinta-feira, Sexta-feira, Sábado]
+    abbr_day_names: [Dom, Seg, Ter, Qua, Qui, Sex, Sáb]
+    month_names: [~, Janeiro, Fevereiro, Março, Abril, Maio, Junho, Julho, Agosto, Setembro, Outubro, Novembro, Dezembro]
+    abbr_month_names: [~, Jan, Fev, Mar, Abr, Mai, Jun, Jul, Ago, Set, Out, Nov, Dez]
+    order:
+      - :day
+      - :month
+      - :year
+  time:
+    formats:
+      default: "%d/%m/%Y %H:%M"
+      short: "%H:%M"
+      long: "%d de %B de %Y, %H:%M"
+  number:
+    currency:
+      format:
+        unit: "R$"
+        precision: 2
+        separator: ","
+        delimiter: "."
+        format: "%u %n"
+    format:
+      separator: ","
+      delimiter: "."
+  activerecord:
+    errors:
+      messages:
+        record_invalid: "A validação falhou: %{errors}"
+        restrict_dependent_destroy:
+          has_one: "Não é possível excluir o registro porque existe um %{record} dependente"
+          has_many: "Não é possível excluir o registro porque existem %{record} dependentes"
+  errors:
+    messages:
+      blank: "não pode ficar em branco"
+      taken: "já está em uso"
+      invalid: "não é válido"
+      too_short: "é muito curto (mínimo de %{count} caracteres)"
+      too_long: "é muito longo (máximo de %{count} caracteres)"
+      not_a_number: "não é um número"
+      greater_than: "deve ser maior que %{count}"
+      greater_than_or_equal_to: "deve ser maior ou igual a %{count}"
+      less_than: "deve ser menor que %{count}"
+      inclusion: "não está incluído na lista"
+  sessions:
+    new:
+      title: "Entrar"
+      email_label: "E-mail"
+      password_label: "Senha"
+      submit: "Entrar"
+      forgot_password: "Esqueceu a senha?"
+  passwords:
+    new:
+      title: "Recuperar senha"
+      submit: "Enviar instruções"
+    edit:
+      title: "Redefinir senha"
+      submit: "Redefinir senha"
+  accounts:
+    name_placeholder: "Nome do consultório"
+  registrations:
+    title: "Criar conta — Enquadre"
+    subtitle: "Prontuário para psicanalistas"
+    account_name: "Nome do consultório"
+    kind: "Tipo de profissional"
+    crp: "CRP (ex: 12345/SP)"
+    password_hint: "Mínimo de 12 caracteres"
+    submit: "Criar conta"
+    already_have_account: "Já tem conta?"
+    welcome: "Bem-vindo ao Enquadre!"
+  professional_profile:
+    kinds:
+      psychoanalyst: "Psicanalista"
+      psychologist: "Psicólogo(a) com CRP"
+  patients:
+    full_name: "Nome completo"
+    cpf: "CPF"
+    phone: "Telefone"
+    email: "E-mail"
+    notes: "Observações"

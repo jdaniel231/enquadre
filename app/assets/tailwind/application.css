@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #F4F0E8;
+  --color-ink: #1E1B18;
+  --color-accent: #8A3324;
+  --color-accent-dark: #6B2419;
+
+  --font-family-display: "Fraunces", Georgia, serif;
+  --font-family-sans: "IBM Plex Sans", system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-family-sans);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-family-display);
+  }
+}

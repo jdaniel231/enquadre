@@ -137,6 +137,96 @@ Deploy com Kamal 2. Preferir hospedagem em região no Brasil (por exemplo, São 
 
 Não use `Session` como nome de model de domínio. Não faça `find` fora do escopo de `Current.account`. Não crie `destroy` para `RecordEntry` ou `IssuedDocument`. Não exponha `PrivateNote` fora do autor. Não coloque conteúdo clínico em logs, seeds ou mensagens de erro. Não use float para dinheiro. Não adicione dependências grandes sem registrar a decisão abaixo. Não envie dados de pacientes para serviços externos de IA sem uma decisão registrada, consentimento e opção desligada por padrão.
 
+## Status de implementação
+
+### Fundação (concluída em 2026-09-29)
+
+| O que | Arquivo(s) principal(is) | Observação |
+|---|---|---|
+| Gems adicionadas | `Gemfile` | `tailwindcss-rails`, `audited`, `grover`, `bcrypt` |
+| Locale pt-BR + timezone | `config/application.rb`, `config/locales/pt-BR.yml` | Datas, moeda, erros em português |
+| Autenticação Rails 8 | `app/models/user.rb`, `app/controllers/concerns/authentication.rb` | `User`, `Session`, `Current` gerados pelo `rails generate authentication` |
+| Multi-tenancy | `app/models/account.rb`, `app/models/current.rb`, `app/controllers/application_controller.rb` | `Current.account` delegado via `user`; helper `current_account` disponível nas views |
+| Tema Tailwind | `app/assets/tailwind/application.css` | Cores `paper`/`ink`/`accent` + Fraunces + IBM Plex Sans via `@theme` |
+| Chaves de criptografia | `config/credentials/development.yml.enc` | Geradas com `rails db:encryption:init`; produção pendente |
+| Banco de dados | `db/schema.rb` | PostgreSQL; user `postgres`, banco `enquadre` em dev |
+
+### Modelos de domínio (concluídos em 2026-09-29)
+
+| Model | Campos relevantes | Destaque |
+|---|---|---|
+| `Account` | `name` | Tenant raiz; tudo pertence a uma conta |
+| `User` | `email_address`, `password_digest`, `account_id` | `belongs_to :account`; `has_one :professional_profile` |
+| `ProfessionalProfile` | `kind` (enum), `crp` | Enum `psychoanalyst / psychologist`; valida CRP com regex; método `can_issue?` |
+| `Patient` | `full_name`, `cpf`, `phone`, `email`, `notes`, `date_of_birth` | Todos os campos PII com `encrypts`; `cpf` determinístico; `audited` |
+| `CarePlan` | `billing_mode` (enum), `sessions_per_week`, `fee_cents` | Enum `monthly / per_session`; `sessions_per_week` 1–4 |
+| `Appointment` | `scheduled_at`, `status` (enum), `fee_cents` | 6 status; scopes `upcoming` / `past` |
+| `RecordEntry` | `body` (criptografado) | `audited`; `before_destroy { throw :abort }` impede exclusão |
+| `PrivateNote` | `body` (criptografado) | Scope `authored_by(user)`; isolamento por autor |
+
+### Fluxos de usuário (concluídos em 2026-09-29)
+
+| Fluxo | Controller | Observação |
+|---|---|---|
+| Registro de conta | `RegistrationsController` | Cria `Account + User + ProfessionalProfile` em transação; Stimulus mostra/esconde CRP |
+| Login / logout | `SessionsController` | Gerado pelo Rails 8 authentication |
+| Recuperação de senha | `PasswordsController` | Gerado pelo Rails 8 authentication |
+
+---
+
+### Pendente
+
+#### Modelos ainda não criados
+
+| Model | Depende de | Prioridade |
+|---|---|---|
+| `AbsencePolicy` | `Account` | Alta — necessário para cálculo de cobranças |
+| `Charge` | `Patient`, `CarePlan` | Alta — fechamento mensal |
+| `IssuedDocument` | `Patient`, `ProfessionalProfile` | Alta — documentos emitidos congelados |
+| `AccessLog` | `User`, `RecordEntry` | Média — auditoria de leitura de prontuário (LGPD) |
+
+#### Interfaces (CRUD) ainda não criadas
+
+| Tela | Observação |
+|---|---|
+| Dashboard | Atualmente vazio (`app/views/dashboard/index.html.erb`) |
+| Listagem e cadastro de pacientes (`Patient`) | — |
+| Plano de atendimento (`CarePlan`) | — |
+| Agenda (`Appointment`) — visualização e transição de status | — |
+| Prontuário (`RecordEntry`) — criar e visualizar entradas | — |
+| Anotações privadas (`PrivateNote`) | — |
+| Emissão de documentos (`IssuedDocument`) + PDF via Grover | — |
+| Fechamento do mês (`MonthlyClosing`) | Objeto de serviço + interface |
+
+#### Segurança / compliance pendentes
+
+| Item | Observação |
+|---|---|
+| `filter_parameter_logging.rb` | Adicionar campos sensíveis (`full_name`, `cpf`, `body`, etc.) |
+| 2FA por TOTP | Previsto na stack; ainda não implementado |
+| Exportação LGPD | `RecordEntry` + `IssuedDocument` por paciente; nunca `PrivateNote` |
+| Chaves de criptografia em produção | Gerar e configurar via Kamal secrets antes do deploy |
+
+#### Testes pendentes
+
+| Teste | Motivo |
+|---|---|
+| Isolamento entre contas | `find` fora do escopo → 404 |
+| Privacidade de `PrivateNote` | Outro usuário da mesma conta não lê |
+| Bloqueio de laudo para psicanalista | `ProfessionalProfile#can_issue?` |
+| Ausência de rota destroy para `RecordEntry` | Regra de retenção |
+| `MonthlyClosing` com faltas | Todas as combinações de modalidade × status |
+| System tests das jornadas principais | Cadastrar paciente, registrar sessão, marcar falta, fechar mês, emitir declaração |
+
+#### Infraestrutura pendente
+
+| Item | Observação |
+|---|---|
+| Job recorrente (Solid Queue) | Gerar `Appointment` das próximas semanas a partir de `CarePlan` ativos |
+| Seeds com dados fictícios | Para desenvolvimento e demos |
+| Deploy (Kamal 2) | Configurar `config/deploy.yml`, secrets, região Brasil |
+| Backups do Postgres | Criptografados, com teste de restauração |
+
 ## Decisões
 
 Registre aqui, com data, toda decisão de arquitetura que mude algo deste arquivo.
@@ -144,3 +234,5 @@ Registre aqui, com data, toda decisão de arquitetura que mude algo deste arquiv
 - 2026-09-29: Rails 8 full-stack com Hotwire, sem API separada. React só pontualmente, se uma tela exigir.
 - 2026-09-29: PostgreSQL em produção.
 - 2026-09-29: Nome do produto: Enquadre (verificar domínio e registro no INPI, classe 42).
+- 2026-09-29: `Registration` implementado como objeto ActiveModel puro (não persiste diretamente), criando `Account + User + ProfessionalProfile` em transação única. Sem model `Registration` na base.
+- 2026-09-29: `Appointment` referencia `CarePlan` como `optional: true` — uma sessão avulsa pode existir fora de um plano. `RecordEntry` referencia `Appointment` como `optional: true` — registro pode ser criado sem sessão associada.

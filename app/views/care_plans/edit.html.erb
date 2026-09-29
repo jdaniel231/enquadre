@@ -1,0 +1,13 @@
+<% content_for :title, t(".title") %>
+
+<div class="max-w-2xl">
+  <div class="mb-6">
+    <p class="text-sm text-ink/40 mb-1">
+      <%= link_to t("patients.index.title"), patients_path, class: "hover:text-accent" %>
+      › <%= link_to @patient.full_name, @patient, class: "hover:text-accent" %>
+    </p>
+    <h1 class="text-3xl font-semibold"><%= t(".title") %></h1>
+  </div>
+
+  <%= render "form", care_plan: @care_plan %>
+</div>

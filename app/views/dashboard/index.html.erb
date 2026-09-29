@@ -1,0 +1,73 @@
+<% content_for :title, "Início" %>
+
+<div class="mb-8">
+  <h1 class="text-3xl font-semibold">Olá, <%= Current.user.email_address.split("@").first %>.</h1>
+  <p class="text-ink/50 text-sm mt-1"><%= l(Date.current, format: :long) %></p>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+  <div class="bg-white/60 border border-ink/10 rounded-lg px-5 py-4">
+    <p class="text-xs text-ink/40 uppercase tracking-wide mb-1">Pacientes</p>
+    <p class="text-3xl font-display font-semibold"><%= @patient_count %></p>
+    <% if @patient_count == 0 %>
+      <p class="text-xs text-ink/40 mt-1"><%= link_to "Cadastrar primeiro paciente →", new_patient_path, class: "hover:text-accent" %></p>
+    <% end %>
+  </div>
+
+  <div class="bg-white/60 border border-ink/10 rounded-lg px-5 py-4">
+    <p class="text-xs text-ink/40 uppercase tracking-wide mb-1">Hoje</p>
+    <p class="text-3xl font-display font-semibold"><%= @today_appointments.count %></p>
+    <p class="text-xs text-ink/40 mt-1"><%= @today_appointments.count == 1 ? "sessão" : "sessões" %></p>
+  </div>
+
+  <div class="bg-white/60 border border-ink/10 rounded-lg px-5 py-4">
+    <p class="text-xs text-ink/40 uppercase tracking-wide mb-1">Próximos dias</p>
+    <p class="text-3xl font-display font-semibold"><%= @upcoming_appointments.count %></p>
+    <p class="text-xs text-ink/40 mt-1"><%= @upcoming_appointments.count == 1 ? "agendamento" : "agendamentos" %></p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <div>
+    <h2 class="text-lg font-semibold mb-3">Sessões de hoje</h2>
+    <% if @today_appointments.any? %>
+      <div class="bg-white/60 border border-ink/10 rounded-lg divide-y divide-ink/5">
+        <% @today_appointments.each do |appt| %>
+          <div class="flex items-center justify-between px-4 py-3 text-sm">
+            <div>
+              <p class="font-medium"><%= appt.patient.full_name %></p>
+              <p class="text-ink/40 text-xs"><%= l(appt.scheduled_at, format: :short) %></p>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-ink/5 text-ink/50">
+              <%= I18n.t("appointments.statuses.#{appt.status}") %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="bg-white/60 border border-ink/10 rounded-lg px-4 py-8 text-center text-sm text-ink/30">
+        Nenhuma sessão hoje.
+      </div>
+    <% end %>
+  </div>
+
+  <div>
+    <h2 class="text-lg font-semibold mb-3">Próximos agendamentos</h2>
+    <% if @upcoming_appointments.any? %>
+      <div class="bg-white/60 border border-ink/10 rounded-lg divide-y divide-ink/5">
+        <% @upcoming_appointments.each do |appt| %>
+          <div class="flex items-center justify-between px-4 py-3 text-sm">
+            <div>
+              <p class="font-medium"><%= appt.patient.full_name %></p>
+              <p class="text-ink/40 text-xs"><%= l(appt.scheduled_at, format: :default) %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="bg-white/60 border border-ink/10 rounded-lg px-4 py-8 text-center text-sm text-ink/30">
+        Nenhum agendamento futuro.
+      </div>
+    <% end %>
+  </div>
+</div>

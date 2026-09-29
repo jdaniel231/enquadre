@@ -1,0 +1,60 @@
+<%= form_with model: [@patient, care_plan], class: "space-y-5" do |f| %>
+  <% if care_plan.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700">
+      <ul class="list-disc list-inside space-y-1">
+        <% care_plan.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <div>
+      <%= f.label :fee, t("care_plans.form.fee"), class: "block text-sm font-medium mb-1" %>
+      <div class="flex items-center border border-ink/20 rounded bg-white/80 focus-within:ring-2 focus-within:ring-accent/40">
+        <span class="px-3 text-ink/40 text-sm">R$</span>
+        <%= f.number_field :fee, step: 0.01, min: 0, required: true,
+            class: "flex-1 py-2 pr-3 text-sm bg-transparent focus:outline-none" %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :billing_mode, t("care_plans.form.billing_mode"), class: "block text-sm font-medium mb-1" %>
+      <%= f.select :billing_mode,
+          CarePlan.billing_modes.keys.map { |k| [ t("care_plans.billing_modes.#{k}"), k ] },
+          {},
+          class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <div>
+      <%= f.label :sessions_per_week, t("care_plans.form.sessions_per_week"), class: "block text-sm font-medium mb-1" %>
+      <%= f.select :sessions_per_week,
+          (1..4).map { |n| [ t("care_plans.form.sessions_per_week_option", count: n), n ] },
+          {},
+          class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40" %>
+    </div>
+
+    <div>
+      <%= f.label :session_duration_minutes, t("care_plans.form.duration"), class: "block text-sm font-medium mb-1" %>
+      <%= f.select :session_duration_minutes,
+          [ [ "45 min", 45 ], [ "50 min", 50 ], [ "60 min", 60 ] ],
+          {},
+          class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40" %>
+    </div>
+  </div>
+
+  <% if care_plan.persisted? %>
+    <div class="flex items-center gap-2">
+      <%= f.check_box :active, class: "rounded border-ink/30 text-accent focus:ring-accent/40" %>
+      <%= f.label :active, t("care_plans.form.active"), class: "text-sm" %>
+    </div>
+  <% end %>
+
+  <div class="flex items-center gap-4 pt-2">
+    <%= f.submit class: "bg-accent hover:bg-accent-dark text-paper px-5 py-2 rounded text-sm font-medium transition-colors cursor-pointer" %>
+    <%= link_to t("general.cancel"), patient_path(@patient), class: "text-sm text-ink/50 hover:text-ink" %>
+  </div>
+<% end %>

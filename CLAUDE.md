@@ -172,6 +172,22 @@ Não use `Session` como nome de model de domínio. Não faça `find` fora do esc
 | Login / logout | `SessionsController` | Gerado pelo Rails 8 authentication |
 | Recuperação de senha | `PasswordsController` | Gerado pelo Rails 8 authentication |
 
+### Interfaces concluídas (2026-09-29)
+
+| Tela | Controller | Observação |
+|---|---|---|
+| Dashboard | `DashboardController` | Cards de pacientes, sessões do dia e próximos agendamentos |
+| Pacientes | `PatientsController` | CRUD completo; `find` sempre via `Current.account` |
+| Plano de atendimento | `CarePlansController` | Nested em `Patient`; virtual attr `fee`/`fee_cents`; listado no `show` do paciente |
+
+### Correções e infraestrutura (2026-09-29)
+
+| Item | Arquivo | Observação |
+|---|---|---|
+| `filter_parameter_logging` | `config/initializers/filter_parameter_logging.rb` | Campos sensíveis adicionados: `full_name`, `cpf`, `body`, `date_of_birth`, etc. |
+| YAML allowlist | `config/application.rb` | `yaml_column_permitted_classes` com `Date` para compatibilidade com `audited` + Psych 4 |
+| Layout com navegação | `app/views/layouts/application.html.erb` | Header com nav, flash messages, `lang="pt-BR"` |
+
 ---
 
 ### Pendente
@@ -185,13 +201,10 @@ Não use `Session` como nome de model de domínio. Não faça `find` fora do esc
 | `IssuedDocument` | `Patient`, `ProfessionalProfile` | Alta — documentos emitidos congelados |
 | `AccessLog` | `User`, `RecordEntry` | Média — auditoria de leitura de prontuário (LGPD) |
 
-#### Interfaces (CRUD) ainda não criadas
+#### Interfaces ainda não criadas
 
 | Tela | Observação |
 |---|---|
-| Dashboard | Atualmente vazio (`app/views/dashboard/index.html.erb`) |
-| Listagem e cadastro de pacientes (`Patient`) | — |
-| Plano de atendimento (`CarePlan`) | — |
 | Agenda (`Appointment`) — visualização e transição de status | — |
 | Prontuário (`RecordEntry`) — criar e visualizar entradas | — |
 | Anotações privadas (`PrivateNote`) | — |
@@ -202,7 +215,6 @@ Não use `Session` como nome de model de domínio. Não faça `find` fora do esc
 
 | Item | Observação |
 |---|---|
-| `filter_parameter_logging.rb` | Adicionar campos sensíveis (`full_name`, `cpf`, `body`, etc.) |
 | 2FA por TOTP | Previsto na stack; ainda não implementado |
 | Exportação LGPD | `RecordEntry` + `IssuedDocument` por paciente; nunca `PrivateNote` |
 | Chaves de criptografia em produção | Gerar e configurar via Kamal secrets antes do deploy |

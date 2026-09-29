@@ -1,0 +1,42 @@
+<% content_for :title, t("record_entries.new.title") %>
+
+<div class="max-w-2xl">
+  <div class="mb-8">
+    <p class="text-sm text-ink/40 mb-1">
+      <%= link_to t("patients.index.title"), patients_path, class: "hover:text-accent" %>
+      <span class="mx-1">·</span>
+      <%= link_to @patient.full_name, @patient, class: "hover:text-accent" %>
+      <span class="mx-1">·</span>
+      <%= link_to t("record_entries.index.breadcrumb"), patient_record_entries_path(@patient), class: "hover:text-accent" %>
+    </p>
+    <h1 class="text-3xl font-semibold"><%= t("record_entries.new.title") %></h1>
+  </div>
+
+  <%= form_with model: [@patient, @record_entry] do |f| %>
+    <% if @record_entry.errors.any? %>
+      <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+        <ul class="list-disc list-inside space-y-1">
+          <% @record_entry.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="bg-white/60 border border-ink/10 rounded-lg p-4">
+      <div class="mb-4">
+        <%= f.label :body, t("record_entries.form.body"), class: "block text-sm text-ink/60 mb-1" %>
+        <%= f.text_area :body, rows: 14,
+            class: "w-full bg-transparent border border-ink/15 rounded px-3 py-2 text-sm text-ink placeholder-ink/30 focus:outline-none focus:ring-1 focus:ring-accent resize-y",
+            placeholder: t("record_entries.form.body_placeholder") %>
+      </div>
+
+      <div class="flex items-center justify-end gap-3">
+        <%= link_to t("general.cancel"), patient_record_entries_path(@patient),
+            class: "text-sm text-ink/40 hover:text-ink" %>
+        <%= f.submit t("record_entries.form.submit"),
+            class: "bg-accent text-paper px-4 py-2 rounded text-sm hover:bg-accent/90 transition-colors cursor-pointer" %>
+      </div>
+    </div>
+  <% end %>
+</div>

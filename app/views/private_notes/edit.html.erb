@@ -1,0 +1,15 @@
+<% content_for :title, t("private_notes.edit.title") %>
+
+<div class="max-w-2xl">
+  <div class="mb-8">
+    <p class="text-sm text-ink/40 mb-1">
+      <%= link_to t("patients.index.title"), patients_path, class: "hover:text-accent" %>
+      <span class="mx-1">·</span>
+      <%= link_to @patient.full_name, @patient, class: "hover:text-accent" %>
+    </p>
+    <h1 class="text-3xl font-semibold"><%= t("private_notes.edit.title") %></h1>
+    <p class="text-xs text-ink/30 mt-1"><%= t("private_notes.visibility_notice") %></p>
+  </div>
+
+  <%= render "form", patient: @patient, private_note: @private_note %>
+</div>

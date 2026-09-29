@@ -14,7 +14,11 @@ Rails.application.routes.draw do
 
   resources :patients do
     resources :care_plans, shallow: true, except: :show
+    resources :record_entries, only: %i[index new create show]
+    resources :private_notes, except: %i[index show]
   end
+
+  resources :appointments, except: :destroy
 
   root "dashboard#index"
 end

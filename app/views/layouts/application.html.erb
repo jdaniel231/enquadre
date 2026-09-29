@@ -31,6 +31,8 @@
             <nav class="flex items-center gap-1">
               <%= link_to "Pacientes", patients_path,
                   class: "px-3 py-1.5 rounded text-sm hover:bg-ink/5 transition-colors #{request.path.start_with?('/patients') ? 'text-accent font-medium' : 'text-ink/60'}" %>
+              <%= link_to "Agenda", appointments_path,
+                  class: "px-3 py-1.5 rounded text-sm hover:bg-ink/5 transition-colors #{request.path.start_with?('/appointments') ? 'text-accent font-medium' : 'text-ink/60'}" %>
             </nav>
           </div>
           <div class="flex items-center gap-3 text-sm text-ink/50">

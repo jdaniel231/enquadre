@@ -172,6 +172,54 @@ Não use `Session` como nome de model de domínio. Não faça `find` fora do esc
 | Login / logout | `SessionsController` | Gerado pelo Rails 8 authentication |
 | Recuperação de senha | `PasswordsController` | Gerado pelo Rails 8 authentication |
 
+### Interfaces concluídas (2026-09-29)
+
+| Tela | Controller | Observação |
+|---|---|---|
+| Dashboard | `DashboardController` | Cards de pacientes, sessões do dia e próximos agendamentos |
+| Pacientes | `PatientsController` | CRUD completo; `find` sempre via `Current.account` |
+| Plano de atendimento | `CarePlansController` | Nested em `Patient`; virtual attr `fee`/`fee_cents`; listado no `show` do paciente |
+| Agenda | `AppointmentsController` | Visualização semanal; transições de status inline; criação e edição |
+| Prontuário | `RecordEntriesController` | Nested em `Patient`; sem edit/destroy; seção no `show` do paciente |
+| Anotações privadas | `PrivateNotesController` | Nested em `Patient`; isolamento por `authored_by(Current.user)`; CRUD completo |
+
+### Modelos de domínio adicionais (concluídos em 2026-09-29)
+
+| Model | Campos relevantes | Destaque |
+|---|---|---|
+| `AbsencePolicy` | `charge_absent_late` (default `true`), `charge_absent_notified` (default `false`) | `has_one` de `Account`; `charges_for?(status)` consulta a política |
+| `Charge` | `year`, `month`, `amount_cents`, `status` (enum) | Único por `patient + year + month`; criado/atualizado por `MonthlyClosing` |
+
+### Serviços (concluídos em 2026-09-29)
+
+| Serviço | Arquivo | Observação |
+|---|---|---|
+| `MonthlyClosing` | `app/services/monthly_closing.rb` | Calcula e persiste `Charge`; idempotente; usa `NullAbsencePolicy` quando conta não tem política configurada |
+
+Regras de cálculo do `MonthlyClosing`:
+- `monthly`: cobra `care_plan.fee_cents` fixo, independente de faltas ou ausências
+- `per_session`: soma sessões cobráveis — `attended` sempre; `absent_late` / `absent_notified` conforme `AbsencePolicy`; `rescheduled` e `cancelled_by_professional` nunca cobram; fee da sessão tem prioridade sobre fee do plano quando presente
+
+### Testes concluídos (2026-09-29)
+
+| Teste | Arquivo |
+|---|---|
+| Isolamento entre contas — paciente de outra conta → 404 | `test/controllers/patients_controller_test.rb` |
+| Isolamento entre contas — `RecordEntry` de outra conta → 404 | `test/controllers/record_entries_controller_test.rb` |
+| Ausência de rota `DELETE` para `RecordEntry` | `test/controllers/record_entries_controller_test.rb` |
+| Privacidade de `PrivateNote` — outro usuário da mesma conta → 404 | `test/controllers/private_notes_controller_test.rb` |
+| `ProfessionalProfile#can_issue?` — todas as combinações tipo × documento | `test/models/professional_profile_test.rb` |
+| `MonthlyClosing` — todas as combinações de `billing_mode × status` | `test/services/monthly_closing_test.rb` |
+
+### Correções e infraestrutura (2026-09-29)
+
+| Item | Arquivo | Observação |
+|---|---|---|
+| `filter_parameter_logging` | `config/initializers/filter_parameter_logging.rb` | Campos sensíveis adicionados: `full_name`, `cpf`, `body`, `date_of_birth`, etc. |
+| YAML allowlist | `config/application.rb` | `yaml_column_permitted_classes` com `Date` para compatibilidade com `audited` + Psych 4 |
+| Layout com navegação | `app/views/layouts/application.html.erb` | Header com nav, flash messages, `lang="pt-BR"` |
+| Chaves AR Encryption no ambiente de teste | `config/environments/test.rb` | Chaves fixas em texto — dados de teste não são segredos |
+
 ---
 
 ### Pendente
@@ -180,29 +228,20 @@ Não use `Session` como nome de model de domínio. Não faça `find` fora do esc
 
 | Model | Depende de | Prioridade |
 |---|---|---|
-| `AbsencePolicy` | `Account` | Alta — necessário para cálculo de cobranças |
-| `Charge` | `Patient`, `CarePlan` | Alta — fechamento mensal |
 | `IssuedDocument` | `Patient`, `ProfessionalProfile` | Alta — documentos emitidos congelados |
 | `AccessLog` | `User`, `RecordEntry` | Média — auditoria de leitura de prontuário (LGPD) |
 
-#### Interfaces (CRUD) ainda não criadas
+#### Interfaces ainda não criadas
 
 | Tela | Observação |
 |---|---|
-| Dashboard | Atualmente vazio (`app/views/dashboard/index.html.erb`) |
-| Listagem e cadastro de pacientes (`Patient`) | — |
-| Plano de atendimento (`CarePlan`) | — |
-| Agenda (`Appointment`) — visualização e transição de status | — |
-| Prontuário (`RecordEntry`) — criar e visualizar entradas | — |
-| Anotações privadas (`PrivateNote`) | — |
 | Emissão de documentos (`IssuedDocument`) + PDF via Grover | — |
-| Fechamento do mês (`MonthlyClosing`) | Objeto de serviço + interface |
+| Fechamento do mês — interface para `MonthlyClosing` | Serviço concluído; falta tela de fechamento e listagem de `Charge` |
 
 #### Segurança / compliance pendentes
 
 | Item | Observação |
 |---|---|
-| `filter_parameter_logging.rb` | Adicionar campos sensíveis (`full_name`, `cpf`, `body`, etc.) |
 | 2FA por TOTP | Previsto na stack; ainda não implementado |
 | Exportação LGPD | `RecordEntry` + `IssuedDocument` por paciente; nunca `PrivateNote` |
 | Chaves de criptografia em produção | Gerar e configurar via Kamal secrets antes do deploy |
@@ -211,11 +250,6 @@ Não use `Session` como nome de model de domínio. Não faça `find` fora do esc
 
 | Teste | Motivo |
 |---|---|
-| Isolamento entre contas | `find` fora do escopo → 404 |
-| Privacidade de `PrivateNote` | Outro usuário da mesma conta não lê |
-| Bloqueio de laudo para psicanalista | `ProfessionalProfile#can_issue?` |
-| Ausência de rota destroy para `RecordEntry` | Regra de retenção |
-| `MonthlyClosing` com faltas | Todas as combinações de modalidade × status |
 | System tests das jornadas principais | Cadastrar paciente, registrar sessão, marcar falta, fechar mês, emitir declaração |
 
 #### Infraestrutura pendente

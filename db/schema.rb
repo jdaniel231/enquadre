@@ -10,9 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_29_135841) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_29_154606) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "absence_policies", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.boolean "charge_absent_late", default: true, null: false
+    t.boolean "charge_absent_notified", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_absence_policies_on_account_id"
+  end
 
   create_table "accounts", force: :cascade do |t|
     t.string "name"
@@ -23,7 +32,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_135841) do
   create_table "appointments", force: :cascade do |t|
     t.bigint "patient_id", null: false
     t.bigint "account_id", null: false
-    t.bigint "care_plan_id", null: false
+    t.bigint "care_plan_id"
     t.datetime "scheduled_at", null: false
     t.integer "status", default: 0, null: false
     t.integer "fee_cents"
@@ -69,6 +78,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_135841) do
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_care_plans_on_account_id"
     t.index ["patient_id"], name: "index_care_plans_on_patient_id"
+  end
+
+  create_table "charges", force: :cascade do |t|
+    t.bigint "patient_id", null: false
+    t.bigint "care_plan_id", null: false
+    t.bigint "account_id", null: false
+    t.integer "year", null: false
+    t.integer "month", null: false
+    t.integer "amount_cents", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_charges_on_account_id"
+    t.index ["care_plan_id"], name: "index_charges_on_care_plan_id"
+    t.index ["patient_id", "year", "month"], name: "index_charges_on_patient_id_and_year_and_month", unique: true
+    t.index ["patient_id"], name: "index_charges_on_patient_id"
   end
 
   create_table "patients", force: :cascade do |t|
@@ -136,11 +161,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_135841) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "absence_policies", "accounts"
   add_foreign_key "appointments", "accounts"
   add_foreign_key "appointments", "care_plans"
   add_foreign_key "appointments", "patients"
   add_foreign_key "care_plans", "accounts"
   add_foreign_key "care_plans", "patients"
+  add_foreign_key "charges", "accounts"
+  add_foreign_key "charges", "care_plans"
+  add_foreign_key "charges", "patients"
   add_foreign_key "patients", "accounts"
   add_foreign_key "private_notes", "patients"
   add_foreign_key "private_notes", "users"

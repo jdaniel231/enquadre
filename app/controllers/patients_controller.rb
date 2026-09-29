@@ -7,6 +7,8 @@ class PatientsController < ApplicationController
 
   def show
     @care_plans = @patient.care_plans.order(active: :desc, created_at: :desc)
+    @record_entries = @patient.record_entries.order(created_at: :desc)
+    @private_notes = @patient.private_notes.authored_by(Current.user).order(created_at: :desc)
   end
 
   def new

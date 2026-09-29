@@ -1,0 +1,54 @@
+<%= form_with model: patient, class: "space-y-5" do |f| %>
+  <% if patient.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700">
+      <ul class="list-disc list-inside space-y-1">
+        <% patient.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :full_name, t("patients.form.full_name"), class: "block text-sm font-medium mb-1" %>
+    <%= f.text_field :full_name, required: true,
+        class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40" %>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <div>
+      <%= f.label :cpf, t("patients.form.cpf"), class: "block text-sm font-medium mb-1" %>
+      <%= f.text_field :cpf, placeholder: "000.000.000-00",
+          class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40" %>
+    </div>
+    <div>
+      <%= f.label :date_of_birth, t("patients.form.date_of_birth"), class: "block text-sm font-medium mb-1" %>
+      <%= f.date_field :date_of_birth,
+          class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <div>
+      <%= f.label :phone, t("patients.form.phone"), class: "block text-sm font-medium mb-1" %>
+      <%= f.telephone_field :phone,
+          class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40" %>
+    </div>
+    <div>
+      <%= f.label :email, t("patients.form.email"), class: "block text-sm font-medium mb-1" %>
+      <%= f.email_field :email,
+          class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40" %>
+    </div>
+  </div>
+
+  <div>
+    <%= f.label :notes, t("patients.form.notes"), class: "block text-sm font-medium mb-1" %>
+    <%= f.text_area :notes, rows: 3,
+        class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40" %>
+  </div>
+
+  <div class="flex items-center gap-4 pt-2">
+    <%= f.submit class: "bg-accent hover:bg-accent-dark text-paper px-5 py-2 rounded text-sm font-medium transition-colors cursor-pointer" %>
+    <%= link_to t("general.cancel"), :back, class: "text-sm text-ink/50 hover:text-ink" %>
+  </div>
+<% end %>

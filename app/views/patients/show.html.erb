@@ -1,0 +1,70 @@
+<% content_for :title, @patient.full_name %>
+
+<div class="max-w-2xl">
+  <div class="flex items-start justify-between mb-8">
+    <div>
+      <p class="text-sm text-ink/40 mb-1"><%= link_to t("patients.index.title"), patients_path, class: "hover:text-accent" %></p>
+      <h1 class="text-3xl font-semibold"><%= @patient.full_name %></h1>
+    </div>
+    <%= link_to t("general.edit"), edit_patient_path(@patient),
+        class: "bg-white/60 border border-ink/15 px-4 py-2 rounded text-sm hover:bg-white transition-colors" %>
+  </div>
+
+  <dl class="bg-white/60 border border-ink/10 rounded-lg divide-y divide-ink/5">
+    <% {
+      t("patients.form.cpf") => @patient.cpf,
+      t("patients.form.date_of_birth") => (@patient.date_of_birth&.strftime("%d/%m/%Y")),
+      t("patients.form.phone") => @patient.phone,
+      t("patients.form.email") => @patient.email
+    }.each do |label, value| %>
+      <div class="flex px-4 py-3 text-sm gap-4">
+        <dt class="text-ink/40 w-40 shrink-0"><%= label %></dt>
+        <dd class="text-ink"><%= value.presence || "—" %></dd>
+      </div>
+    <% end %>
+
+    <% if @patient.notes.present? %>
+      <div class="px-4 py-3 text-sm">
+        <dt class="text-ink/40 mb-1"><%= t("patients.form.notes") %></dt>
+        <dd class="text-ink whitespace-pre-wrap"><%= @patient.notes %></dd>
+      </div>
+    <% end %>
+  </dl>
+
+  <div class="mt-8">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-lg font-semibold"><%= t("care_plans.section_title") %></h2>
+      <%= link_to t("care_plans.new"), new_patient_care_plan_path(@patient),
+          class: "text-sm text-accent hover:underline" %>
+    </div>
+
+    <% if @care_plans.any? %>
+      <div class="bg-white/60 border border-ink/10 rounded-lg divide-y divide-ink/5">
+        <% @care_plans.each do |plan| %>
+          <div class="flex items-center justify-between px-4 py-3 text-sm">
+            <div>
+              <p class="font-medium">
+                <%= number_to_currency(plan.fee, unit: "R$", separator: ",", delimiter: ".") %>
+                <span class="text-ink/40 font-normal">/ <%= t("care_plans.billing_modes.#{plan.billing_mode}").downcase %></span>
+              </p>
+              <p class="text-ink/40 text-xs mt-0.5">
+                <%= t("care_plans.form.sessions_per_week_option", count: plan.sessions_per_week) %> ·
+                <%= plan.session_duration_minutes %> min
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <% unless plan.active? %>
+                <span class="text-xs text-ink/30"><%= t("care_plans.inactive") %></span>
+              <% end %>
+              <%= link_to t("general.edit"), edit_care_plan_path(plan), class: "text-xs text-ink/40 hover:text-accent" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="bg-white/60 border border-ink/10 rounded-lg px-4 py-6 text-center text-sm text-ink/30">
+        <%= link_to t("care_plans.new"), new_patient_care_plan_path(@patient), class: "hover:text-accent" %>
+      </div>
+    <% end %>
+  </div>
+</div>

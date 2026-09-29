@@ -77,9 +77,66 @@ pt-BR:
     kinds:
       psychoanalyst: "Psicanalista"
       psychologist: "Psicólogo(a) com CRP"
+  care_plans:
+    section_title: "Plano de atendimento"
+    new: "Novo plano"
+    inactive: "Inativo"
+    billing_modes:
+      monthly: "Mensal"
+      per_session: "Por sessão"
+    form:
+      fee: "Valor da sessão"
+      billing_mode: "Modalidade de cobrança"
+      sessions_per_week: "Sessões por semana"
+      sessions_per_week_option:
+        one: "1 sessão por semana"
+        other: "%{count} sessões por semana"
+      duration: "Duração"
+      active: "Plano ativo"
+    new:
+      title: "Novo plano de atendimento"
+    edit:
+      title: "Editar plano de atendimento"
+    create:
+      success: "Plano criado com sucesso."
+    update:
+      success: "Plano atualizado com sucesso."
+  appointments:
+    statuses:
+      scheduled: "Agendada"
+      attended: "Realizada"
+      absent_notified: "Falta avisada"
+      absent_late: "Falta sem aviso"
+      rescheduled: "Remarcada"
+      cancelled_by_professional: "Cancelada"
+  general:
+    edit: "Editar"
+    cancel: "Cancelar"
+    save: "Salvar"
   patients:
-    full_name: "Nome completo"
-    cpf: "CPF"
-    phone: "Telefone"
-    email: "E-mail"
-    notes: "Observações"
+    index:
+      title: "Pacientes"
+      new_patient: "Novo paciente"
+      name: "Nome"
+      phone: "Telefone"
+      email: "E-mail"
+      edit: "editar"
+      empty_title: "Nenhum paciente cadastrado"
+      empty_body: "Cadastre o primeiro paciente para começar."
+    show:
+      title: "%{name}"
+    new:
+      title: "Novo paciente"
+    edit:
+      title: "Editar %{name}"
+    create:
+      success: "Paciente cadastrado com sucesso."
+    update:
+      success: "Dados atualizados com sucesso."
+    form:
+      full_name: "Nome completo"
+      cpf: "CPF"
+      date_of_birth: "Data de nascimento"
+      phone: "Telefone"
+      email: "E-mail"
+      notes: "Observações internas"

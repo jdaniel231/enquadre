@@ -19,5 +19,11 @@ module Enquadre
     config.i18n.default_locale = :"pt-BR"
     config.i18n.available_locales = [ :"pt-BR" ]
     config.time_zone = "America/Sao_Paulo"
+
+    # audited serializa mudanças em YAML; Psych 4 (Ruby 3.1+) requer allowlist explícita
+    config.active_record.yaml_column_permitted_classes = [
+      Symbol, Date, Time, DateTime, BigDecimal,
+      ActiveSupport::HashWithIndifferentAccess
+    ]
   end
 end

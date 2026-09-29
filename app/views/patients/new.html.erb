@@ -1,0 +1,9 @@
+<% content_for :title, t(".title") %>
+
+<div class="max-w-2xl">
+  <div class="mb-6">
+    <h1 class="text-3xl font-semibold"><%= t(".title") %></h1>
+  </div>
+
+  <%= render "form", patient: @patient %>
+</div>

@@ -1,0 +1,28 @@
+<% content_for :title, t("record_entries.show.title", date: @record_entry.created_at.strftime("%d/%m/%Y")) %>
+
+<div class="max-w-2xl">
+  <div class="mb-8">
+    <p class="text-sm text-ink/40 mb-1">
+      <%= link_to t("patients.index.title"), patients_path, class: "hover:text-accent" %>
+      <span class="mx-1">·</span>
+      <%= link_to @patient.full_name, @patient, class: "hover:text-accent" %>
+      <span class="mx-1">·</span>
+      <%= link_to t("record_entries.index.breadcrumb"), patient_record_entries_path(@patient), class: "hover:text-accent" %>
+    </p>
+    <h1 class="text-3xl font-semibold">
+      <%= @record_entry.created_at.strftime("%d/%m/%Y") %>
+    </h1>
+    <p class="text-sm text-ink/40 mt-1">
+      <%= @record_entry.created_at.strftime("%H:%M") %>
+      <% if @record_entry.appointment %>
+        · <%= t("record_entries.show.linked_appointment") %>
+      <% end %>
+    </p>
+  </div>
+
+  <div class="bg-white/60 border border-ink/10 rounded-lg p-6">
+    <div class="text-sm text-ink leading-relaxed whitespace-pre-wrap font-serif"><%= @record_entry.body %></div>
+  </div>
+
+  <p class="text-xs text-ink/30 mt-4 text-right"><%= t("record_entries.show.immutable_notice") %></p>
+</div>

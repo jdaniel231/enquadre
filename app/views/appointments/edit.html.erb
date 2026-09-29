@@ -1,0 +1,9 @@
+<% content_for :title, "Editar sessão" %>
+
+<div class="max-w-2xl">
+  <div class="mb-6">
+    <p class="text-sm text-ink/40 mb-1"><%= link_to "Agenda", appointments_path, class: "hover:text-accent" %></p>
+    <h1 class="text-3xl font-semibold">Editar sessão</h1>
+  </div>
+  <%= render "form", appointment: @appointment, patients: @patients %>
+</div>

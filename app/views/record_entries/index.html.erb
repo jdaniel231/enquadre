@@ -1,0 +1,38 @@
+<% content_for :title, t("record_entries.index.title", name: @patient.full_name) %>
+
+<div class="max-w-2xl">
+  <div class="flex items-start justify-between mb-8">
+    <div>
+      <p class="text-sm text-ink/40 mb-1">
+        <%= link_to t("patients.index.title"), patients_path, class: "hover:text-accent" %>
+        <span class="mx-1">·</span>
+        <%= link_to @patient.full_name, @patient, class: "hover:text-accent" %>
+      </p>
+      <h1 class="text-3xl font-semibold"><%= t("record_entries.index.title", name: @patient.full_name) %></h1>
+    </div>
+    <%= link_to t("record_entries.new"), new_patient_record_entry_path(@patient),
+        class: "bg-accent text-paper px-4 py-2 rounded text-sm hover:bg-accent/90 transition-colors" %>
+  </div>
+
+  <% if @record_entries.any? %>
+    <div class="bg-white/60 border border-ink/10 rounded-lg divide-y divide-ink/5">
+      <% @record_entries.each do |entry| %>
+        <%= link_to patient_record_entry_path(@patient, entry),
+            class: "flex items-start justify-between px-4 py-3 hover:bg-white/80 transition-colors group" do %>
+          <div>
+            <p class="text-sm font-medium text-ink group-hover:text-accent transition-colors">
+              <%= entry.created_at.strftime("%d/%m/%Y %H:%M") %>
+            </p>
+            <p class="text-xs text-ink/40 mt-0.5 line-clamp-2"><%= entry.body.truncate(120) %></p>
+          </div>
+          <span class="text-ink/30 text-xs ml-4 shrink-0 mt-0.5"><%= t("record_entries.index.view") %></span>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="bg-white/60 border border-ink/10 rounded-lg px-4 py-10 text-center text-sm text-ink/30">
+      <%= t("record_entries.index.empty") %>
+      <%= link_to t("record_entries.new"), new_patient_record_entry_path(@patient), class: "block mt-2 text-accent hover:underline" %>
+    </div>
+  <% end %>
+</div>

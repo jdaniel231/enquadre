@@ -1,0 +1,139 @@
+<% content_for :title, "Agenda" %>
+
+<%
+  hour_px        = 64
+  calendar_start = 7
+  calendar_end   = 21
+  hours          = (calendar_start...calendar_end).to_a
+  grid_height    = hours.count * hour_px
+  prev_week      = @week_start - 7
+  next_week      = @week_start + 7
+%>
+
+<div class="flex items-center justify-between mb-4">
+  <div class="flex items-center gap-3">
+    <div class="flex items-center gap-1">
+      <%= link_to appointments_path(week: prev_week),
+          class: "p-1.5 rounded hover:bg-ink/5 transition-colors",
+          title: "Semana anterior" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      <% end %>
+      <%= link_to appointments_path(week: next_week),
+          class: "p-1.5 rounded hover:bg-ink/5 transition-colors",
+          title: "Próxima semana" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      <% end %>
+    </div>
+    <h1 class="text-lg font-semibold">
+      <% if @week_start.month == @week_end.month %>
+        <%= @week_start.strftime("%-d") %> – <%= @week_end.strftime("%-d de %B de %Y") %>
+      <% else %>
+        <%= l(@week_start, format: :short) %> – <%= l(@week_end, format: :short) %>
+      <% end %>
+    </h1>
+    <% if @week_start != Date.current.beginning_of_week(:monday) %>
+      <%= link_to "Hoje", appointments_path, class: "text-xs text-ink/40 hover:text-accent border border-ink/20 px-2 py-1 rounded" %>
+    <% end %>
+  </div>
+
+  <%= link_to "Nova sessão", new_appointment_path,
+      class: "bg-accent hover:bg-accent-dark text-paper px-4 py-2 rounded text-sm font-medium transition-colors" %>
+</div>
+
+<div class="overflow-x-auto rounded-lg border border-ink/10 bg-white/40" data-controller="calendar">
+  <div class="flex min-w-[640px]">
+
+    <%# Coluna de horas %>
+    <div class="w-14 shrink-0 border-r border-ink/10">
+      <div class="h-12 border-b border-ink/10"></div>
+      <div class="relative" style="height: <%= grid_height %>px">
+        <% hours.each do |h| %>
+          <div class="absolute right-2 text-xs text-ink/30 select-none" style="top: <%= (h - calendar_start) * hour_px - 7 %>px">
+            <%= sprintf("%02d:00", h) %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Colunas dos dias %>
+    <% @week_days.each do |day| %>
+      <%
+        is_today = day == Date.current
+        day_appts = @by_day[day] || []
+      %>
+      <div class="flex-1 border-r border-ink/10 last:border-r-0 min-w-0">
+        <%# Header do dia %>
+        <div class="h-12 border-b border-ink/10 flex flex-col items-center justify-center gap-0.5">
+          <span class="text-[10px] uppercase tracking-wider text-ink/40"><%= l(day, format: "%a") %></span>
+          <span class="text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full <%= is_today ? 'bg-accent text-paper' : 'text-ink' %>">
+            <%= day.day %>
+          </span>
+        </div>
+
+        <%# Grade horária %>
+        <div class="relative cursor-pointer"
+             style="height: <%= grid_height %>px"
+             data-action="click->calendar#clickSlot"
+             data-calendar-date-value="<%= day.iso8601 %>">
+
+          <%# Linhas de hora %>
+          <% hours.each do |h| %>
+            <div class="absolute w-full border-t border-ink/5 pointer-events-none"
+                 style="top: <%= (h - calendar_start) * hour_px %>px"></div>
+          <% end %>
+
+          <%# Linha de meia hora %>
+          <% hours.each do |h| %>
+            <div class="absolute w-full border-t border-ink/[0.03] pointer-events-none"
+                 style="top: <%= (h - calendar_start) * hour_px + hour_px / 2 %>px"></div>
+          <% end %>
+
+          <%# Linha do horário atual (só hoje) %>
+          <% if is_today %>
+            <%
+              now   = Time.current.in_time_zone
+              now_top = ((now.hour - calendar_start) * hour_px) + (now.min.to_f * hour_px / 60).round
+            %>
+            <% if now.hour.between?(calendar_start, calendar_end - 1) %>
+              <div class="absolute w-full pointer-events-none z-20" style="top: <%= now_top %>px">
+                <div class="flex items-center gap-0">
+                  <div class="w-2 h-2 rounded-full bg-accent ml-0 -translate-x-1"></div>
+                  <div class="flex-1 h-px bg-accent"></div>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+
+          <%# Sessões %>
+          <% day_appts.each do |appt| %>
+            <%
+              top    = appointment_top_px(appt)
+              height = appointment_height_px(appt)
+            %>
+            <%= link_to appointment_path(appt),
+                class: "absolute left-0.5 right-0.5 rounded border overflow-hidden text-xs font-medium px-1.5 py-0.5 hover:brightness-95 transition-all z-10 #{appointment_color_classes(appt)}",
+                style: "top: #{top}px; height: #{height}px",
+                data: { turbo: false } do %>
+              <span class="block truncate leading-tight"><%= appt.patient.full_name %></span>
+              <% if height >= 40 %>
+                <span class="block text-[10px] opacity-60 leading-tight"><%= l(appt.scheduled_at, format: :short) %></span>
+              <% end %>
+            <% end %>
+          <% end %>
+
+        </div>
+      </div>
+    <% end %>
+
+  </div>
+</div>
+
+<%# Legenda %>
+<div class="flex flex-wrap gap-3 mt-4 text-xs text-ink/50">
+  <% AppointmentsHelper::STATUS_COLORS.each do |status, classes| %>
+    <span class="flex items-center gap-1.5">
+      <span class="w-2.5 h-2.5 rounded-sm border <%= classes %>"></span>
+      <%= I18n.t("appointments.statuses.#{status}") %>
+    </span>
+  <% end %>
+</div>

@@ -1,0 +1,8 @@
+psychologist:
+  user: one
+  kind: 1
+  crp: "12345/SP"
+
+psychoanalyst:
+  user: three
+  kind: 0

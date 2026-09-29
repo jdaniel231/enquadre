@@ -1,0 +1,80 @@
+<%= form_with model: appointment, class: "space-y-5",
+    data: { controller: "appointment-form" } do |f| %>
+  <% if appointment.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700">
+      <ul class="list-disc list-inside space-y-1">
+        <% appointment.errors.each do |e| %>
+          <li><%= e.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <div>
+      <%= f.label :patient_id, "Paciente", class: "block text-sm font-medium mb-1" %>
+      <%= f.select :patient_id,
+          patients.map { |p| [p.full_name, p.id] },
+          { include_blank: "Selecione…" },
+          class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40",
+          data: {
+            appointment_form_target: "patientSelect",
+            action: "change->appointment-form#loadCarePlans"
+          } %>
+    </div>
+
+    <div>
+      <%= f.label :care_plan_id, "Plano de atendimento", class: "block text-sm font-medium mb-1" %>
+      <%= f.select :care_plan_id,
+          [],
+          { include_blank: "Selecione o paciente primeiro" },
+          class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40",
+          data: {
+            appointment_form_target: "carePlanSelect",
+            action: "change->appointment-form#updateFee",
+            current_id: appointment.care_plan_id
+          } %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <div>
+      <%= f.label :scheduled_at, "Data e hora", class: "block text-sm font-medium mb-1" %>
+      <%= f.datetime_local_field :scheduled_at,
+          value: appointment.scheduled_at&.strftime("%Y-%m-%dT%H:%M"),
+          required: true,
+          class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40" %>
+    </div>
+
+    <div>
+      <%= f.label :fee, "Valor (R$)", class: "block text-sm font-medium mb-1" %>
+      <div class="flex items-center border border-ink/20 rounded bg-white/80 focus-within:ring-2 focus-within:ring-accent/40">
+        <span class="px-3 text-ink/40 text-sm">R$</span>
+        <%= f.number_field :fee, step: 0.01, min: 0,
+            class: "flex-1 py-2 pr-3 text-sm bg-transparent focus:outline-none",
+            data: { appointment_form_target: "feeField" } %>
+      </div>
+    </div>
+  </div>
+
+  <% if appointment.persisted? %>
+    <div>
+      <%= f.label :status, "Status", class: "block text-sm font-medium mb-1" %>
+      <%= f.select :status,
+          Appointment.statuses.keys.map { |s| [I18n.t("appointments.statuses.#{s}"), s] },
+          {},
+          class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40" %>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :notes, "Observações", class: "block text-sm font-medium mb-1" %>
+    <%= f.text_area :notes, rows: 2,
+        class: "w-full border border-ink/20 rounded px-3 py-2 text-sm bg-white/80 focus:outline-none focus:ring-2 focus:ring-accent/40" %>
+  </div>
+
+  <div class="flex items-center gap-4 pt-2">
+    <%= f.submit class: "bg-accent hover:bg-accent-dark text-paper px-5 py-2 rounded text-sm font-medium transition-colors cursor-pointer" %>
+    <%= link_to "Cancelar", :back, class: "text-sm text-ink/50 hover:text-ink" %>
+  </div>
+<% end %>

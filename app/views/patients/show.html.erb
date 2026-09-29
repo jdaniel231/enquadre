@@ -33,6 +33,73 @@
 
   <div class="mt-8">
     <div class="flex items-center justify-between mb-3">
+      <h2 class="text-lg font-semibold"><%= t("record_entries.section_title") %></h2>
+      <%= link_to t("record_entries.new"), new_patient_record_entry_path(@patient),
+          class: "text-sm text-accent hover:underline" %>
+    </div>
+    <% if @record_entries.any? %>
+      <div class="bg-white/60 border border-ink/10 rounded-lg divide-y divide-ink/5">
+        <% @record_entries.first(3).each do |entry| %>
+          <%= link_to patient_record_entry_path(@patient, entry),
+              class: "flex items-center justify-between px-4 py-3 text-sm hover:bg-white/80 transition-colors" do %>
+            <span class="font-medium"><%= entry.created_at.strftime("%d/%m/%Y %H:%M") %></span>
+            <span class="text-ink/30 text-xs"><%= entry.body.truncate(60) %></span>
+          <% end %>
+        <% end %>
+        <% if @record_entries.size > 3 %>
+          <div class="px-4 py-2 text-center">
+            <%= link_to t("record_entries.index.see_all"), patient_record_entries_path(@patient),
+                class: "text-xs text-accent hover:underline" %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="bg-white/60 border border-ink/10 rounded-lg px-4 py-6 text-center text-sm text-ink/30">
+        <%= link_to t("record_entries.new"), new_patient_record_entry_path(@patient), class: "hover:text-accent" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-8">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-lg font-semibold"><%= t("private_notes.section_title") %></h2>
+      <%= link_to t("private_notes.new_short"), new_patient_private_note_path(@patient),
+          class: "text-sm text-accent hover:underline" %>
+    </div>
+    <% if @private_notes.any? %>
+      <div class="bg-white/60 border border-ink/10 rounded-lg divide-y divide-ink/5">
+        <% @private_notes.first(3).each do |note| %>
+          <div class="flex items-start justify-between px-4 py-3 text-sm gap-4">
+            <div class="min-w-0">
+              <p class="text-xs text-ink/40 mb-0.5"><%= note.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+              <p class="text-ink whitespace-pre-wrap line-clamp-3"><%= note.body %></p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <%= link_to t("general.edit"), edit_patient_private_note_path(@patient, note),
+                  class: "text-xs text-ink/40 hover:text-accent" %>
+              <%= button_to t("general.delete"), patient_private_note_path(@patient, note),
+                  method: :delete,
+                  data: { turbo_confirm: t("private_notes.confirm_delete") },
+                  class: "text-xs text-ink/30 hover:text-red-600 transition-colors bg-transparent border-0 p-0 cursor-pointer" %>
+            </div>
+          </div>
+        <% end %>
+        <% if @private_notes.size > 3 %>
+          <p class="px-4 py-2 text-xs text-ink/30 text-center">
+            +<%= @private_notes.size - 3 %> <%= t("private_notes.more") %>
+            · <%= link_to t("private_notes.new_short"), new_patient_private_note_path(@patient), class: "text-accent hover:underline" %>
+          </p>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="bg-white/60 border border-ink/10 rounded-lg px-4 py-6 text-center text-sm text-ink/30">
+        <%= link_to t("private_notes.new_short"), new_patient_private_note_path(@patient), class: "hover:text-accent" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-8">
+    <div class="flex items-center justify-between mb-3">
       <h2 class="text-lg font-semibold"><%= t("care_plans.section_title") %></h2>
       <%= link_to t("care_plans.new"), new_patient_care_plan_path(@patient),
           class: "text-sm text-accent hover:underline" %>

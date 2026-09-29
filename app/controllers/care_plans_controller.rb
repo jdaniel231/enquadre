@@ -1,6 +1,18 @@
 class CarePlansController < ApplicationController
-  before_action :set_patient, only: %i[new create]
+  before_action :set_patient, only: %i[index new create]
   before_action :set_care_plan, only: %i[edit update]
+
+  def index
+    care_plans = @patient.care_plans.where(active: true).order(created_at: :desc)
+    render json: care_plans.map { |cp|
+      {
+        id: cp.id,
+        label: "#{number_to_currency(cp.fee, unit: 'R$', separator: ',', delimiter: '.')} / #{I18n.t("care_plans.billing_modes.#{cp.billing_mode}").downcase}",
+        fee: cp.fee,
+        duration: cp.session_duration_minutes
+      }
+    }
+  end
 
   def new
     @care_plan = @patient.care_plans.new

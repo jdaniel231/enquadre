@@ -1,0 +1,58 @@
+<% content_for :title, @appointment.patient.full_name %>
+
+<div class="max-w-xl">
+  <div class="mb-6">
+    <p class="text-sm text-ink/40 mb-1"><%= link_to "Agenda", appointments_path, class: "hover:text-accent" %></p>
+    <h1 class="text-3xl font-semibold"><%= @appointment.patient.full_name %></h1>
+    <p class="text-ink/40 text-sm mt-1"><%= l(@appointment.scheduled_at, format: :default) %></p>
+  </div>
+
+  <div class="bg-white/60 border border-ink/10 rounded-lg divide-y divide-ink/5 mb-6">
+    <div class="flex px-4 py-3 text-sm gap-4">
+      <dt class="text-ink/40 w-32 shrink-0">Status</dt>
+      <dd>
+        <span class="px-2 py-0.5 rounded-full text-xs border font-medium <%= appointment_color_classes(@appointment) %>">
+          <%= I18n.t("appointments.statuses.#{@appointment.status}") %>
+        </span>
+      </dd>
+    </div>
+    <div class="flex px-4 py-3 text-sm gap-4">
+      <dt class="text-ink/40 w-32 shrink-0">Valor</dt>
+      <dd><%= @appointment.fee ? number_to_currency(@appointment.fee, unit: "R$", separator: ",", delimiter: ".") : "—" %></dd>
+    </div>
+    <% if @appointment.care_plan %>
+      <div class="flex px-4 py-3 text-sm gap-4">
+        <dt class="text-ink/40 w-32 shrink-0">Duração</dt>
+        <dd><%= @appointment.care_plan.session_duration_minutes %> min</dd>
+      </div>
+    <% end %>
+    <% if @appointment.notes.present? %>
+      <div class="px-4 py-3 text-sm">
+        <dt class="text-ink/40 mb-1">Observações</dt>
+        <dd class="whitespace-pre-wrap"><%= @appointment.notes %></dd>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Transições rápidas de status %>
+  <% if @appointment.scheduled? %>
+    <div class="mb-6">
+      <p class="text-xs text-ink/40 uppercase tracking-wide mb-2">Registrar resultado</p>
+      <div class="flex flex-wrap gap-2">
+        <% { attended: "Realizada", absent_notified: "Falta avisada", absent_late: "Falta sem aviso", cancelled_by_professional: "Cancelada" }.each do |status, label| %>
+          <%= button_to label, @appointment,
+              method: :patch,
+              params: { appointment: { status: status } },
+              class: "text-sm px-3 py-1.5 rounded border border-ink/20 hover:bg-ink/5 transition-colors" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="flex gap-3">
+    <%= link_to "Editar", edit_appointment_path(@appointment),
+        class: "text-sm px-4 py-2 border border-ink/20 rounded hover:bg-ink/5 transition-colors" %>
+    <%= link_to "Ver paciente", @appointment.patient,
+        class: "text-sm text-ink/40 hover:text-accent" %>
+  </div>
+</div>

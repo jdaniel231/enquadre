@@ -50,4 +50,10 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Chaves fixas para Active Record Encryption no ambiente de teste.
+  # Não são segredos — dados de teste não têm valor fora do banco de teste.
+  config.active_record.encryption.primary_key       = "test-primary-key-exactly-32chars"
+  config.active_record.encryption.deterministic_key = "test-deterministic-key-32-chars!"
+  config.active_record.encryption.key_derivation_salt = "test-key-derivation-salt-32chars"
 end

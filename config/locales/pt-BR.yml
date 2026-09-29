@@ -109,10 +109,56 @@ pt-BR:
       absent_late: "Falta sem aviso"
       rescheduled: "Remarcada"
       cancelled_by_professional: "Cancelada"
+    create:
+      success: "Sessão agendada com sucesso."
+    update:
+      success: "Sessão atualizada com sucesso."
   general:
     edit: "Editar"
     cancel: "Cancelar"
     save: "Salvar"
+    delete: "Excluir"
+  private_notes:
+    section_title: "Anotações privadas"
+    new_short: "Nova anotação"
+    visibility_notice: "Visível apenas para você. Nunca compartilhado."
+    more: "anotações"
+    confirm_delete: "Excluir esta anotação? Essa ação não pode ser desfeita."
+    new:
+      title: "Nova anotação privada"
+    edit:
+      title: "Editar anotação"
+    form:
+      body: "Anotação"
+      body_placeholder: "Associações livres, hipóteses de transferência, sonhos…"
+      submit: "Salvar anotação"
+    create:
+      success: "Anotação salva."
+    update:
+      success: "Anotação atualizada."
+    destroy:
+      success: "Anotação excluída."
+  record_entries:
+    section_title: "Prontuário"
+    new: "Nova entrada"
+    index:
+      title: "Prontuário — %{name}"
+      breadcrumb: "Prontuário"
+      view: "ver"
+      empty: "Nenhuma entrada no prontuário."
+      see_all: "Ver todas as entradas"
+    new:
+      title: "Nova entrada no prontuário"
+    show:
+      title: "Prontuário — %{date}"
+      linked_appointment: "Sessão vinculada"
+      immutable_notice: "Este registro não pode ser alterado."
+    form:
+      body: "Registro"
+      body_placeholder: "Descreva a sessão, observações clínicas relevantes…"
+      submit: "Salvar registro"
+    create:
+      success: "Registro salvo com sucesso."
   patients:
     index:
       title: "Pacientes"

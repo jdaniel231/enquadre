@@ -15,6 +15,7 @@ class Patient < ApplicationRecord
   has_many :appointments, dependent: :destroy
   has_many :record_entries, dependent: :destroy
   has_many :private_notes, dependent: :destroy
+  has_many :issued_documents, dependent: :destroy
 
   scope :for_account, ->(account) { where(account: account) }
 end

@@ -30,6 +30,13 @@ pt-BR:
       delimiter: "."
   activerecord:
     errors:
+      models:
+        issued_document:
+          attributes:
+            base:
+              no_profile: "perfil profissional não configurado"
+            kind:
+              not_allowed: "não permitido para este tipo de profissional"
       messages:
         record_invalid: "A validação falhou: %{errors}"
         restrict_dependent_destroy:
@@ -138,6 +145,39 @@ pt-BR:
       success: "Anotação atualizada."
     destroy:
       success: "Anotação excluída."
+  issued_documents:
+    section_title: "Documentos emitidos"
+    new: "Emitir documento"
+    kinds:
+      attendance_declaration: "Declaração de comparecimento"
+      receipt: "Recibo"
+      progress_report: "Relatório de acompanhamento"
+      psychological_report: "Laudo psicológico"
+    document:
+      patient: "Paciente"
+      amount: "Valor"
+    index:
+      title: "Documentos — %{name}"
+      breadcrumb: "Documentos"
+      view: "ver"
+      empty: "Nenhum documento emitido."
+      see_all: "Ver todos os documentos"
+    new:
+      title: "Emitir documento"
+    show:
+      title: "%{kind}"
+      download_pdf: "Baixar PDF"
+      immutable_notice: "Documento congelado no momento da emissão. Não pode ser alterado."
+    form:
+      kind: "Tipo de documento"
+      kind_prompt: "Selecione o tipo"
+      content: "Conteúdo"
+      content_placeholder: "Descreva o conteúdo do documento…"
+      amount: "Valor (apenas para recibo)"
+      amount_hint: "Preencha apenas para recibos."
+      submit: "Emitir documento"
+    create:
+      success: "Documento emitido com sucesso."
   record_entries:
     section_title: "Prontuário"
     new: "Nova entrada"

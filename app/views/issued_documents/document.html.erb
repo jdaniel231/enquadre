@@ -1,0 +1,30 @@
+<div class="document-body">
+  <div class="doc-header">
+    <p class="clinic-name"><%= document.account.name %></p>
+    <h1 class="doc-title"><%= t("issued_documents.kinds.#{document.kind}") %></h1>
+    <p class="doc-date"><%= l(issued_at.to_date) %></p>
+  </div>
+
+  <div class="doc-meta">
+    <p><strong><%= t("issued_documents.document.patient") %>:</strong> <%= document.patient.full_name %></p>
+  </div>
+
+  <div class="doc-content">
+    <%= simple_format(sanitize(document.content)) %>
+  </div>
+
+  <% if document.receipt? && document.amount_cents.present? %>
+    <div class="doc-amount">
+      <p><strong><%= t("issued_documents.document.amount") %>:</strong>
+         <%= number_to_currency(document.amount, unit: "R$", separator: ",", delimiter: ".") %></p>
+    </div>
+  <% end %>
+
+  <div class="doc-signature">
+    <p><%= document.user.email_address %></p>
+    <% profile = document.user.professional_profile %>
+    <% if profile&.psychologist? %>
+      <p>CRP <%= profile.crp %></p>
+    <% end %>
+  </div>
+</div>

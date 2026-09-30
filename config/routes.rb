@@ -16,6 +16,9 @@ Rails.application.routes.draw do
     resources :care_plans, shallow: true, except: :show
     resources :record_entries, only: %i[index new create show]
     resources :private_notes, except: %i[index show]
+    resources :issued_documents, only: %i[index new create show] do
+      member { get :pdf }
+    end
   end
 
   resources :appointments, except: :destroy

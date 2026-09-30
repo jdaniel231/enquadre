@@ -1,0 +1,37 @@
+<% content_for :title, t("issued_documents.show.title", kind: t("issued_documents.kinds.#{@issued_document.kind}")) %>
+
+<div class="max-w-2xl">
+  <div class="flex items-start justify-between mb-8">
+    <div>
+      <p class="text-sm text-ink/40 mb-1">
+        <%= link_to @patient.full_name, @patient, class: "hover:text-accent" %>
+        <span class="mx-1">·</span>
+        <%= link_to t("issued_documents.index.breadcrumb"), patient_issued_documents_path(@patient), class: "hover:text-accent" %>
+      </p>
+      <h1 class="text-2xl font-semibold"><%= t("issued_documents.kinds.#{@issued_document.kind}") %></h1>
+      <p class="text-sm text-ink/40 mt-1"><%= @issued_document.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+    </div>
+    <%= link_to t("issued_documents.show.download_pdf"), pdf_patient_issued_document_path(@patient, @issued_document),
+        class: "bg-accent text-paper px-4 py-2 rounded text-sm hover:bg-accent/90 transition-colors" %>
+  </div>
+
+  <div class="text-xs text-ink/30 mb-4 flex items-center gap-1">
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+    <%= t("issued_documents.show.immutable_notice") %>
+  </div>
+
+  <div class="bg-white border border-ink/10 rounded-lg p-8 text-sm leading-relaxed font-serif">
+    <%= sanitize @issued_document.rendered_html, tags: %w[div p strong em br h1 h2 h3 ul ol li span], attributes: %w[class] %>
+  </div>
+</div>
+
+<style>
+  .document-body .clinic-name { font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 4px; }
+  .document-body .doc-title { font-size: 1.5rem; font-weight: bold; margin: 0 0 4px; }
+  .document-body .doc-date { font-size: 0.75rem; color: #9ca3af; margin: 0 0 1.5rem; }
+  .document-body .doc-meta { margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid #e5e7eb; }
+  .document-body .doc-content { margin-bottom: 1.5rem; min-height: 80px; }
+  .document-body .doc-amount { margin-bottom: 1.5rem; padding: 0.75rem; background: #f9f7f4; border-left: 3px solid #8A3324; }
+  .document-body .doc-signature { margin-top: 3rem; padding-top: 0.75rem; border-top: 1px solid #e5e7eb; font-size: 0.75rem; color: #6b7280; }
+  .document-body p { margin: 0.25rem 0; }
+</style>

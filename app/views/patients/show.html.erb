@@ -100,6 +100,35 @@
 
   <div class="mt-8">
     <div class="flex items-center justify-between mb-3">
+      <h2 class="text-lg font-semibold"><%= t("issued_documents.section_title") %></h2>
+      <%= link_to t("issued_documents.new"), new_patient_issued_document_path(@patient),
+          class: "text-sm text-accent hover:underline" %>
+    </div>
+    <% if @issued_documents.any? %>
+      <div class="bg-white/60 border border-ink/10 rounded-lg divide-y divide-ink/5">
+        <% @issued_documents.first(3).each do |doc| %>
+          <%= link_to patient_issued_document_path(@patient, doc),
+              class: "flex items-center justify-between px-4 py-3 text-sm hover:bg-white/80 transition-colors" do %>
+            <span class="font-medium"><%= t("issued_documents.kinds.#{doc.kind}") %></span>
+            <span class="text-xs text-ink/30"><%= doc.created_at.strftime("%d/%m/%Y") %></span>
+          <% end %>
+        <% end %>
+        <% if @issued_documents.size > 3 %>
+          <div class="px-4 py-2 text-center">
+            <%= link_to t("issued_documents.index.see_all"), patient_issued_documents_path(@patient),
+                class: "text-xs text-accent hover:underline" %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="bg-white/60 border border-ink/10 rounded-lg px-4 py-6 text-center text-sm text-ink/30">
+        <%= link_to t("issued_documents.new"), new_patient_issued_document_path(@patient), class: "hover:text-accent" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-8">
+    <div class="flex items-center justify-between mb-3">
       <h2 class="text-lg font-semibold"><%= t("care_plans.section_title") %></h2>
       <%= link_to t("care_plans.new"), new_patient_care_plan_path(@patient),
           class: "text-sm text-accent hover:underline" %>

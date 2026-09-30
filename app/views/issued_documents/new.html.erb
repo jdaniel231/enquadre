@@ -1,0 +1,60 @@
+<% content_for :title, t("issued_documents.new.title") %>
+
+<div class="max-w-2xl">
+  <div class="mb-8">
+    <p class="text-sm text-ink/40 mb-1">
+      <%= link_to @patient.full_name, @patient, class: "hover:text-accent" %>
+    </p>
+    <h1 class="text-3xl font-semibold"><%= t("issued_documents.new.title") %></h1>
+  </div>
+
+  <%= form_with model: [@patient, @issued_document] do |f| %>
+    <% if @issued_document.errors.any? %>
+      <div class="bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-6 text-sm text-red-700">
+        <% @issued_document.errors.full_messages.each do |msg| %>
+          <p><%= msg %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="bg-white/60 border border-ink/10 rounded-lg divide-y divide-ink/5">
+      <div class="px-4 py-3">
+        <%= f.label :kind, t("issued_documents.form.kind"), class: "block text-sm text-ink/60 mb-1" %>
+        <%= f.select :kind,
+            IssuedDocument.kinds.keys.filter_map { |k|
+              next if k == "psychological_report" && !Current.user.professional_profile&.psychologist?
+              [t("issued_documents.kinds.#{k}"), k]
+            },
+            { prompt: t("issued_documents.form.kind_prompt") },
+            class: "w-full text-sm bg-transparent border-0 p-0 focus:outline-none" %>
+      </div>
+
+      <div class="px-4 py-3">
+        <%= f.label :content, t("issued_documents.form.content"), class: "block text-sm text-ink/60 mb-1" %>
+        <%= f.text_area :content,
+            rows: 8,
+            placeholder: t("issued_documents.form.content_placeholder"),
+            class: "w-full text-sm bg-transparent border-0 p-0 resize-none focus:outline-none" %>
+      </div>
+
+      <div class="px-4 py-3">
+        <%= f.label :amount, t("issued_documents.form.amount"), class: "block text-sm text-ink/60 mb-1" %>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-ink/40">R$</span>
+          <%= f.text_field :amount,
+              value: @issued_document.amount,
+              placeholder: "0,00",
+              class: "text-sm bg-transparent border-0 p-0 focus:outline-none w-32" %>
+        </div>
+        <p class="text-xs text-ink/30 mt-1"><%= t("issued_documents.form.amount_hint") %></p>
+      </div>
+    </div>
+
+    <div class="mt-6 flex items-center gap-4">
+      <%= f.submit t("issued_documents.form.submit"),
+          class: "bg-accent text-paper px-6 py-2 rounded text-sm font-medium hover:bg-accent/90 transition-colors cursor-pointer" %>
+      <%= link_to t("general.cancel"), @patient,
+          class: "text-sm text-ink/40 hover:text-ink" %>
+    </div>
+  <% end %>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_29_154606) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_29_175343) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -96,6 +96,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_154606) do
     t.index ["patient_id"], name: "index_charges_on_patient_id"
   end
 
+  create_table "issued_documents", force: :cascade do |t|
+    t.bigint "patient_id", null: false
+    t.bigint "account_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "kind", null: false
+    t.text "content", null: false
+    t.text "rendered_html", null: false
+    t.integer "amount_cents"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_issued_documents_on_account_id"
+    t.index ["patient_id"], name: "index_issued_documents_on_patient_id"
+    t.index ["user_id"], name: "index_issued_documents_on_user_id"
+  end
+
   create_table "patients", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.string "full_name"
@@ -170,6 +185,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_154606) do
   add_foreign_key "charges", "accounts"
   add_foreign_key "charges", "care_plans"
   add_foreign_key "charges", "patients"
+  add_foreign_key "issued_documents", "accounts"
+  add_foreign_key "issued_documents", "patients"
+  add_foreign_key "issued_documents", "users"
   add_foreign_key "patients", "accounts"
   add_foreign_key "private_notes", "patients"
   add_foreign_key "private_notes", "users"

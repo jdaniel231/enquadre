@@ -182,13 +182,15 @@ Não use `Session` como nome de model de domínio. Não faça `find` fora do esc
 | Agenda | `AppointmentsController` | Visualização semanal; transições de status inline; criação e edição |
 | Prontuário | `RecordEntriesController` | Nested em `Patient`; sem edit/destroy; seção no `show` do paciente |
 | Anotações privadas | `PrivateNotesController` | Nested em `Patient`; isolamento por `authored_by(Current.user)`; CRUD completo |
+| Documentos emitidos | `IssuedDocumentsController` | Nested em `Patient`; sem edit/destroy; HTML congelado na emissão; PDF via Grover; validação de `can_issue?` por tipo de profissional |
 
-### Modelos de domínio adicionais (concluídos em 2026-09-29)
+### Modelos de domínio adicionais (concluídos em 2026-09-30)
 
 | Model | Campos relevantes | Destaque |
 |---|---|---|
 | `AbsencePolicy` | `charge_absent_late` (default `true`), `charge_absent_notified` (default `false`) | `has_one` de `Account`; `charges_for?(status)` consulta a política |
 | `Charge` | `year`, `month`, `amount_cents`, `status` (enum) | Único por `patient + year + month`; criado/atualizado por `MonthlyClosing` |
+| `IssuedDocument` | `kind` (enum), `content` (criptografado), `rendered_html` (criptografado), `amount_cents` | `audited`; destroy bloqueado; HTML congelado na criação; PDF gerado via Grover sob demanda |
 
 ### Serviços (concluídos em 2026-09-29)
 
@@ -207,6 +209,11 @@ Regras de cálculo do `MonthlyClosing`:
 | Isolamento entre contas — paciente de outra conta → 404 | `test/controllers/patients_controller_test.rb` |
 | Isolamento entre contas — `RecordEntry` de outra conta → 404 | `test/controllers/record_entries_controller_test.rb` |
 | Ausência de rota `DELETE` para `RecordEntry` | `test/controllers/record_entries_controller_test.rb` |
+| Isolamento entre contas — `IssuedDocument` de outra conta → 404 | `test/controllers/issued_documents_controller_test.rb` |
+| Ausência de rota `DELETE` para `IssuedDocument` | `test/controllers/issued_documents_controller_test.rb` |
+| Psicanalista bloqueado de emitir laudo psicológico | `test/controllers/issued_documents_controller_test.rb` |
+| `IssuedDocument` — todas as combinações tipo × profissional | `test/models/issued_document_test.rb` |
+| Destroy de `IssuedDocument` bloqueado pelo model | `test/models/issued_document_test.rb` |
 | Privacidade de `PrivateNote` — outro usuário da mesma conta → 404 | `test/controllers/private_notes_controller_test.rb` |
 | `ProfessionalProfile#can_issue?` — todas as combinações tipo × documento | `test/models/professional_profile_test.rb` |
 | `MonthlyClosing` — todas as combinações de `billing_mode × status` | `test/services/monthly_closing_test.rb` |
@@ -219,6 +226,7 @@ Regras de cálculo do `MonthlyClosing`:
 | YAML allowlist | `config/application.rb` | `yaml_column_permitted_classes` com `Date` para compatibilidade com `audited` + Psych 4 |
 | Layout com navegação | `app/views/layouts/application.html.erb` | Header com nav, flash messages, `lang="pt-BR"` |
 | Chaves AR Encryption no ambiente de teste | `config/environments/test.rb` | Chaves fixas em texto — dados de teste não são segredos |
+| Puppeteer (Grover/PDF) | `package.json`, `node_modules/` | `npm install puppeteer` na raiz do projeto; `node_modules/` no `.gitignore` |
 
 ---
 
@@ -228,14 +236,12 @@ Regras de cálculo do `MonthlyClosing`:
 
 | Model | Depende de | Prioridade |
 |---|---|---|
-| `IssuedDocument` | `Patient`, `ProfessionalProfile` | Alta — documentos emitidos congelados |
 | `AccessLog` | `User`, `RecordEntry` | Média — auditoria de leitura de prontuário (LGPD) |
 
 #### Interfaces ainda não criadas
 
 | Tela | Observação |
 |---|---|
-| Emissão de documentos (`IssuedDocument`) + PDF via Grover | — |
 | Fechamento do mês — interface para `MonthlyClosing` | Serviço concluído; falta tela de fechamento e listagem de `Charge` |
 
 #### Segurança / compliance pendentes
@@ -270,3 +276,4 @@ Registre aqui, com data, toda decisão de arquitetura que mude algo deste arquiv
 - 2026-09-29: Nome do produto: Enquadre (verificar domínio e registro no INPI, classe 42).
 - 2026-09-29: `Registration` implementado como objeto ActiveModel puro (não persiste diretamente), criando `Account + User + ProfessionalProfile` em transação única. Sem model `Registration` na base.
 - 2026-09-29: `Appointment` referencia `CarePlan` como `optional: true` — uma sessão avulsa pode existir fora de um plano. `RecordEntry` referencia `Appointment` como `optional: true` — registro pode ser criado sem sessão associada.
+- 2026-09-30: `IssuedDocument#rendered_html` armazena o fragmento HTML do corpo do documento (sem layout completo), gerado via `render_to_string` na criação. PDF gerado sob demanda pela action `pdf` usando Grover + Puppeteer. Input do usuário sanitizado via `sanitize` antes de entrar no HTML armazenado.

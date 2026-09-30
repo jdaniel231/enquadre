@@ -1,0 +1,33 @@
+<% content_for :title, t("issued_documents.index.title", name: @patient.full_name) %>
+
+<div class="max-w-2xl">
+  <div class="flex items-start justify-between mb-8">
+    <div>
+      <p class="text-sm text-ink/40 mb-1">
+        <%= link_to @patient.full_name, @patient, class: "hover:text-accent" %>
+      </p>
+      <h1 class="text-3xl font-semibold"><%= t("issued_documents.index.breadcrumb") %></h1>
+    </div>
+    <%= link_to t("issued_documents.new"), new_patient_issued_document_path(@patient),
+        class: "bg-white/60 border border-ink/15 px-4 py-2 rounded text-sm hover:bg-white transition-colors" %>
+  </div>
+
+  <% if @issued_documents.any? %>
+    <div class="bg-white/60 border border-ink/10 rounded-lg divide-y divide-ink/5">
+      <% @issued_documents.each do |doc| %>
+        <%= link_to patient_issued_document_path(@patient, doc),
+            class: "flex items-center justify-between px-4 py-3 text-sm hover:bg-white/80 transition-colors" do %>
+          <div>
+            <p class="font-medium"><%= t("issued_documents.kinds.#{doc.kind}") %></p>
+            <p class="text-xs text-ink/40 mt-0.5"><%= doc.created_at.strftime("%d/%m/%Y %H:%M") %></p>
+          </div>
+          <span class="text-xs text-ink/30"><%= t("issued_documents.index.view") %></span>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="bg-white/60 border border-ink/10 rounded-lg px-4 py-10 text-center text-sm text-ink/30">
+      <%= t("issued_documents.index.empty") %>
+    </div>
+  <% end %>
+</div>
